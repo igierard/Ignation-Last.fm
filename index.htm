@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="js/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/underscore.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/d3.v2.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/lastfm.api.md5.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/lastfm.api.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css" media="screen">
+			.chart rect{
+				fill: #33F;
+				stroke: #FFF;
+			}
+		</style>
+	</head>
+	<body>
+		<span id="go_btn">Go</span>
+		<script type="text/javascript" charset="utf-8">
+			$(document).ready(function(){
+				var chart = d3.select('body').append('svg').attr('class','chart').attr('width',300).attr('height',300);
+				var x_scale = d3.scale.linear().range([0,chart.attr('width')]);
+				var data = [];
+				var lastfm = new LastFM({
+						apiKey    : '3946d9652b2ec720e64817132b9a8caf',
+						apiSecret : '271a87784b4bf4b559deec1ecf13e9d9',
+					});
+
+					/* Load some artist info. */
+					lastfm.user.getTopArtists({user: 'captdat3', period:'overall'}, {success: function(data){
+						var max_count = parseInt( _.max( data.topartists.artist, function(r){ return parseInt(r.playcount);} ).playcount);
+						x_scale.domain([0,max_count]);
+						chart.attr('height',data.topartists.artist.length*20);
+						chart.selectAll('rect').data(data.topartists.artist).enter().append("rect")
+						.attr("y", function(d, i) { return i * 20; })
+						.attr("width", function(d){ return x_scale(parseInt(d.playcount)) } ) 
+						.attr("height", 20);
+					}, error: function(code, message){
+						debugger;
+					}});
+				
+				
+				
+				
+				$("#go_btn").click(function(){
+					console.log("hey");
+					chart;
+					chart.selectAll('rect').data([25,50,75,100]).transition().duration(1000).attr("width", x_scale);
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>
